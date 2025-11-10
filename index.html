@@ -10,121 +10,137 @@
     :root {
       --bg1: #e6f0ff;
       --bg2: #f3e8ff;
-      --glass: rgba(255,255,255,0.66);
       --muted: #6b7280;
       --accent: #2563eb;
       --green: #16a34a;
       --red: #ef4444;
-      --card-shadow: 0 10px 30px rgba(20,20,50,0.08);
       --radius: 14px;
+      --shadow: 0 10px 30px rgba(20,20,50,0.08);
     }
 
-    *{box-sizing:border-box;}
     body {
+      font-family:"Poppins",sans-serif;
       margin:0;
-      font-family:"Poppins", sans-serif;
       background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh;
       display:flex;justify-content:center;align-items:center;
-      padding:28px;min-height:100vh;
+      padding:30px;
     }
 
     .container {
       width:100%;max-width:1100px;
-      display:grid;grid-template-columns:1fr 420px;
-      gap:22px;
+      display:grid;grid-template-columns:1fr 400px;
+      gap:24px;
     }
-    @media (max-width:900px){.container{grid-template-columns:1fr;}}
+    @media(max-width:900px){.container{grid-template-columns:1fr;}}
 
     .card {
-      background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.8));
+      background:white;
       border-radius:var(--radius);
+      box-shadow:var(--shadow);
       padding:20px;
-      box-shadow:var(--card-shadow);
-      backdrop-filter:blur(10px);
     }
 
-    h1 {margin:0;font-weight:600;font-size:22px;}
-    p {color:var(--muted);margin-top:4px;}
-
-    .uploader {
-      margin-top:16px;
-      border:2px dashed rgba(0,0,0,0.08);
-      padding:20px;
-      border-radius:12px;
-      display:flex;justify-content:space-between;align-items:center;
-      background:rgba(255,255,255,0.8);
-    }
     .btn {
-      background:var(--accent);color:white;font-weight:600;
-      border:none;border-radius:8px;padding:10px 14px;cursor:pointer;
+      background:var(--accent);color:white;
+      border:none;padding:10px 14px;
+      border-radius:8px;font-weight:600;cursor:pointer;
     }
     .btn.secondary {
-      background:transparent;color:var(--accent);border:1px solid var(--accent);
+      background:transparent;border:1px solid var(--accent);
+      color:var(--accent);
     }
 
-    input[type=file]{display:none;}
     .status-badge {
-      display:inline-block;padding:8px 12px;border-radius:999px;color:white;font-weight:700;
+      display:inline-block;
+      padding:8px 12px;border-radius:999px;color:white;font-weight:700;
     }
     .status-safe{background:var(--green);}
     .status-unsafe{background:var(--red);}
     .status-unknown{background:#9ca3af;}
 
+    .uploader {
+      margin-top:16px;
+      border:2px dashed rgba(0,0,0,0.1);
+      padding:20px;border-radius:12px;
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,0.8);
+    }
+
+    input[type=file]{display:none;}
+
     .chart-wrap{width:220px;height:220px;margin:auto;}
 
     .history-item {
-      background:white;border-radius:10px;padding:10px;
+      background:#f9fafb;border-radius:8px;padding:10px;
       display:flex;justify-content:space-between;align-items:center;
       box-shadow:0 2px 8px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h1>Ransomware File Scanner</h1>
-      <p>Upload any file to check for ransomware-like patterns. Works completely offline — no data leaves your device.</p>
+<div class="container">
+  <div class="card">
+    <h1>Ransomware File Scanner</h1>
+    <p>Upload any file to check for ransomware-like behavior. Runs fully offline, safe for demo.</p>
 
-      <div id="dropZone" class="uploader">
-        <div>
-          <p><strong>Drop file here</strong> or click Browse</p>
-          <small style="color:var(--muted);">Supports .txt, .py, .js, and other text files.</small>
-        </div>
-        <div>
-          <label class="btn" for="fileInput">Browse</label>
-          <button class="btn secondary" id="btnScan">Scan</button>
-          <input id="fileInput" type="file" />
-        </div>
-      </div>
-
-      <div style="margin-top:16px;">
-        <button class="btn secondary" id="downloadSafe">Download Safe File</button>
-        <button class="btn secondary" id="downloadMal">Download Ransomware Sample</button>
-      </div>
-
-      <h3 style="margin-top:20px;">Scan History</h3>
-      <div id="history" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
-
-    <div class="card">
-      <div class="chart-wrap"><canvas id="chartCanvas" width="220" height="220"></canvas></div>
-      <div style="text-align:center;margin-top:10px;">
-        <div id="statusBadge" class="status-badge status-unknown">UNKNOWN</div>
-        <p id="fileNameDisplay">No file scanned</p>
+    <div class="uploader">
+      <div>
+        <p><strong>Drop or browse a file</strong></p>
+        <small style="color:var(--muted)">Supports .txt, .py, .js, etc.</small>
       </div>
       <div>
-        <h3>Scan Details</h3>
-        <div id="detectedInfo" style="font-size:14px;color:var(--muted)">No results yet.</div>
-        <pre id="rawPreview" style="background:#f9fafb;border-radius:8px;padding:10px;min-height:100px;overflow:auto;font-size:12px;"></pre>
+        <label class="btn" for="fileInput">Browse</label>
+        <button class="btn secondary" id="btnScan">Scan</button>
+        <input id="fileInput" type="file" />
       </div>
     </div>
+
+    <div style="margin-top:16px;">
+      <button class="btn secondary" id="downloadSafe">Download Safe File</button>
+      <button class="btn secondary" id="downloadMal">Download Ransomware Sample</button>
+      <button class="btn secondary" id="clearHistory">Clear History</button>
+    </div>
+
+    <h3 style="margin-top:20px;">Scan History</h3>
+    <div id="history" style="display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 
+  <div class="card">
+    <div class="chart-wrap"><canvas id="chartCanvas" width="220" height="220"></canvas></div>
+    <div style="text-align:center;margin-top:10px;">
+      <div id="statusBadge" class="status-badge status-unknown">UNKNOWN</div>
+      <p id="fileNameDisplay">No file scanned</p>
+    </div>
+    <div>
+      <h3>Scan Details</h3>
+      <div id="detectedInfo" style="font-size:14px;color:var(--muted)">No results yet.</div>
+      <pre id="rawPreview" style="background:#f3f4f6;border-radius:8px;padding:10px;min-height:100px;overflow:auto;font-size:12px;"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Replace your existing <script> block with this -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
 <script>
 (() => {
-  const ransomKeywords = ["encrypt","decrypt","ransom","bitcoin","wallet","payment","key","locker","restore","decryptor"];
-  const ransomAmountPattern = /\b(\$?\d+\s?(usd|bitcoin|btc)?)\b/i;
+  // --- Config: keywords, phrases & regexes ---
+  const keywords = ["encrypt","decrypt","ransom","bitcoin","wallet","payment","key","locker","restore","decryptor","files","demand","send"];
+  const highRiskPhrases = [
+    /your files have been encrypted/i,
+    /all (of )?your files (are )?encrypted/i,
+    /to restore .* you must/i,
+    /send .* to .* to decrypt/i,
+    /pay .* to .* to decrypt/i,
+    /contact .* to decrypt/i
+  ];
 
+  // currency and amount patterns
+  const amountRegex = /\b(?:\$ ?\d{2,6}(?:,\d{3})?(?:\.\d+)?|\d{2,6}\s?(?:usd|inr|eur|rs|rupees)|\d+(\.\d+)?\s?(?:btc|bitcoin))\b/i;
+  // bitcoin address regex (basic): bech32 (bc1...) or legacy (1 or 3...)
+  const btcRegex = /\b(?:bc1[a-z0-9]{25,39}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})\b/gi;
+
+  // DOM refs
   const fileInput = document.getElementById('fileInput');
   const btnScan = document.getElementById('btnScan');
   const statusBadge = document.getElementById('statusBadge');
@@ -134,8 +150,11 @@
   const historyEl = document.getElementById('history');
   const downloadSafe = document.getElementById('downloadSafe');
   const downloadMal = document.getElementById('downloadMal');
+  const clearHistory = document.getElementById('clearHistory');
+
   let currentFile = null;
 
+  // Chart
   const ctx = document.getElementById('chartCanvas').getContext('2d');
   const chart = new Chart(ctx, {
     type:'doughnut',
@@ -143,80 +162,237 @@
     options:{cutout:'70%',plugins:{legend:{position:'bottom'}}}
   });
 
-  fileInput.addEventListener('change', e=>{
-    currentFile = e.target.files[0];
-    if(currentFile) fileNameDisplay.textContent = currentFile.name;
-  });
-
-  btnScan.addEventListener('click', ()=>{
-    if(!currentFile){alert('Please select a file first!');return;}
-    const reader = new FileReader();
-    reader.onload = e=>{
-      const text = e.target.result.toLowerCase();
-      const matches = ransomKeywords.filter(k=>text.includes(k));
-      const amount = text.match(ransomAmountPattern);
-      const isRansom = matches.length>2 || amount;
-      updateUI(isRansom,matches,amount,text);
-      saveHistory({name:currentFile.name,unsafe:isRansom,time:new Date().toLocaleString()});
-    };
-    reader.readAsText(currentFile);
-  });
-
-  function updateUI(isRansom,words,amount,text){
-    if(isRansom){
-      statusBadge.className = 'status-badge status-unsafe';
-      statusBadge.textContent = 'RANSOMWARE';
-      detectedInfo.innerHTML = `<strong>Detected keywords:</strong> ${words.join(', ')}<br>${amount?`<strong>Demand:</strong> ${amount[0]}`:''}`;
-      chart.data.datasets[0].data=[0,1];
-    } else {
-      statusBadge.className = 'status-badge status-safe';
-      statusBadge.textContent = 'SAFE';
-      detectedInfo.textContent = 'No ransomware patterns detected.';
-      chart.data.datasets[0].data=[1,0];
-    }
-    rawPreview.textContent = text.slice(0,400);
+  // ---------- Helpers ----------
+  function setStatusUnknown() {
+    statusBadge.className = 'status-badge status-unknown';
+    statusBadge.textContent = 'UNKNOWN';
+    fileNameDisplay.textContent = 'No file scanned';
+    detectedInfo.textContent = 'No results yet.';
+    rawPreview.textContent = '';
+    chart.data.datasets[0].data = [0,0];
     chart.update();
   }
 
-  function saveHistory(entry){
-    const hist = JSON.parse(localStorage.getItem('ransomHistory')||'[]');
-    hist.unshift(entry); if(hist.length>20) hist.pop();
-    localStorage.setItem('ransomHistory',JSON.stringify(hist));
-    renderHistory();
+  function readFileAsArrayBuffer(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = () => rej(new Error('read error'));
+      r.readAsArrayBuffer(file);
+    });
   }
-
-  function renderHistory(){
-    const hist = JSON.parse(localStorage.getItem('ransomHistory')||'[]');
-    historyEl.innerHTML='';
-    if(hist.length===0){historyEl.innerHTML='<p style="color:gray;">No scans yet.</p>';return;}
-    hist.forEach(h=>{
-      const el=document.createElement('div');
-      el.className='history-item';
-      el.innerHTML=`<div><strong>${h.name}</strong><br><small>${h.time}</small></div>
-                    <div style="color:${h.unsafe?'#ef4444':'#16a34a'};font-weight:700;">${h.unsafe?'Ransomware':'Safe'}</div>`;
-      historyEl.appendChild(el);
+  function readFileAsText(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result));
+      r.onerror = () => rej(new Error('read error'));
+      r.readAsText(file, 'utf-8');
     });
   }
 
+  // Use PDF.js to extract text from PDF reliably
+  async function extractTextFromPDF(arrayBuffer) {
+    try {
+      const loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
+      const pdf = await loadingTask.promise;
+      const maxPages = pdf.numPages;
+      let combined = '';
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map(item => item.str).join(' ');
+        combined += '\n' + strings;
+        // Optional: safety limit for very big PDFs
+        if (combined.length > 20000) break;
+      }
+      return combined;
+    } catch (err) {
+      return '';
+    }
+  }
+
+  // Score the text heuristically
+  function scoreText(text) {
+    const low = (text || '').toLowerCase();
+
+    let score = 0;
+    const hits = [];
+
+    // keyword hits (low weight)
+    for (const kw of keywords) {
+      if (low.includes(kw)) {
+        score += 1; hits.push(kw);
+      }
+    }
+
+    // high-risk phrase hits (higher weight)
+    for (const p of highRiskPhrases) {
+      if (p.test(text)) {
+        score += 4;
+        hits.push(p.toString());
+      }
+    }
+
+    // amount detection (strong signal +3)
+    const amount = text.match(amountRegex);
+    if (amount) { score += 3; }
+
+    // bitcoin addresses (very strong signal)
+    const btc = text.match(btcRegex);
+    if (btc && btc.length > 0) { score += 4; }
+
+    // contextual verbs near keywords: presence of both 'send'/'pay' and 'decrypt' increases confidence
+    const hasSend = /\b(send|pay|transfer)\b/i.test(text);
+    const hasDecrypt = /\b(decrypt|restore)\b/i.test(text);
+    if (hasSend && hasDecrypt) { score += 2; }
+
+    return { score, hits, amount: amount ? amount[0] : null, btc: btc || null };
+  }
+
+  // Decide threshold based on file type
+  function isLikelyRansom(text, filename) {
+    const ext = (filename || '').split('.').pop()?.toLowerCase() || '';
+    const result = scoreText(text);
+
+    // default thresholds:
+    // - text / code: threshold 3
+    // - pdf: threshold 5 (higher because PDFs contain more natural language)
+    const threshold = (ext === 'pdf' || ext === 'doc' || ext === 'docx') ? 5 : 3;
+
+    return { suspected: result.score >= threshold, meta: result };
+  }
+
+  // ---------- Event handlers ----------
+  fileInput.addEventListener('change', e=>{
+    currentFile = e.target.files[0];
+    if (currentFile) {
+      fileNameDisplay.textContent = currentFile.name;
+      statusBadge.className = 'status-badge status-unknown';
+      statusBadge.textContent = 'READY';
+      detectedInfo.textContent = 'Ready to scan...';
+    }
+  });
+
+  // scan button
+  btnScan.addEventListener('click', async ()=>{
+    if (!currentFile) { alert('Select a file first'); return; }
+
+    btnScan.disabled = true;
+    btnScan.textContent = 'Scanning...';
+
+    const filename = currentFile.name;
+    const ext = filename.split('.').pop()?.toLowerCase();
+
+    let text = '';
+    try {
+      if (ext === 'pdf' || currentFile.type === 'application/pdf') {
+        // use PDF.js to extract text
+        const arr = await readFileAsArrayBuffer(currentFile);
+        text = await extractTextFromPDF(arr);
+        if (!text) {
+          // fallback to raw text read if PDF.js failed
+          text = await readFileAsText(currentFile);
+        }
+      } else {
+        // read as plain text (works for .txt, .py, .js, .md)
+        try {
+          text = await readFileAsText(currentFile);
+        } catch (e) {
+          // fallback to arraybuffer decode
+          const arr = await readFileAsArrayBuffer(currentFile);
+          text = new TextDecoder('utf-8', {fatal:false}).decode(new Uint8Array(arr));
+        }
+      }
+    } catch (err) {
+      text = '';
+    }
+
+    // small normalization and limit preview length
+    const preview = String(text || '').slice(0, 2000);
+
+    // scoring + decision
+    const { suspected, meta } = isLikelyRansom(text, filename);
+
+    // Update UI
+    if (suspected) {
+      statusBadge.className = 'status-badge status-unsafe';
+      statusBadge.textContent = 'RANSOMWARE';
+      detectedInfo.innerHTML = `<strong>Threat score:</strong> ${meta.score} — <strong>Indicators:</strong> ${meta.hits.join(', ') || '—'}
+        ${meta.amount? `<br><strong>Demand:</strong> ${meta.amount}` : '' }
+        ${meta.btc? `<br><strong>BTC addresses:</strong> ${meta.btc.join(', ')}` : '' }`;
+      chart.data.datasets[0].data = [0,1];
+    } else {
+      statusBadge.className = 'status-badge status-safe';
+      statusBadge.textContent = 'SAFE';
+      detectedInfo.innerHTML = '<strong>Detected:</strong> No strong ransomware indicators (low score).';
+      chart.data.datasets[0].data = [1,0];
+    }
+
+    rawPreview.textContent = preview || '—';
+    chart.update();
+
+    // save history
+    const cur = JSON.parse(localStorage.getItem('ransomHistory') || '[]');
+    cur.unshift({ name: filename, unsafe: suspected, time: new Date().toLocaleString(), score: meta.score });
+    if (cur.length > 40) cur.pop();
+    localStorage.setItem('ransomHistory', JSON.stringify(cur));
+    renderHistory();
+
+    btnScan.disabled = false;
+    btnScan.textContent = 'Scan';
+  });
+
+  // render history
+  function renderHistory() {
+    const hist = JSON.parse(localStorage.getItem('ransomHistory') || '[]');
+    historyEl.innerHTML = '';
+    if (hist.length === 0) {
+      historyEl.innerHTML = '<p style="color:gray;">No scans yet.</p>';
+      return;
+    }
+    for (const h of hist) {
+      const el = document.createElement('div');
+      el.className = 'history-item';
+      el.innerHTML = `<div><strong>${escapeHtml(h.name)}</strong><br><small>${escapeHtml(h.time)}</small></div>
+                      <div style="text-align:right"><div style="color:${h.unsafe ? '#ef4444' : '#16a34a'};font-weight:700">${h.unsafe ? 'Ransomware' : 'Safe'}</div>
+                      <small style="color:#6b7280">score: ${h.score}</small></div>`;
+      historyEl.appendChild(el);
+    }
+  }
+
+  // clear history
+  if (clearHistory) {
+    clearHistory.addEventListener('click', () => {
+      localStorage.removeItem('ransomHistory');
+      renderHistory();
+      alert('History cleared');
+    });
+  }
+
+  // downloads (safe + sample) — keep same as before
+  if (downloadSafe) {
+    downloadSafe.addEventListener('click', () => {
+      const safeData = "This is a harmless test file. Nothing to worry about.\n# safe sample";
+      const blob = new Blob([safeData], { type: 'text/plain' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'safe_file.txt'; a.click();
+    });
+  }
+  if (downloadMal) {
+    downloadMal.addEventListener('click', () => {
+      const malData = `Your files have been encrypted!\nTo restore your files, send 500 USD in bitcoin to address: 1BoatSLRHtKNngkdXEeobR76b53LETtpyT\nContact attacker@darkmail.example\nSend payment to decrypt.`;
+      const blob = new Blob([malData], { type: 'text/plain' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'ransomware_sample.txt'; a.click();
+    });
+  }
+
+  // small helper
+  function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // init
+  setStatusUnknown();
   renderHistory();
-
-  downloadSafe.onclick=()=>{
-    const safeData="print('Hello! This is a harmless Python file.')\n# Safe file example";
-    const blob=new Blob([safeData],{type:'text/plain'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='safe_file.py';a.click();
-  };
-
-  downloadMal.onclick=()=>{
-    const malData=`# Simulated ransomware script (for demo)
-print("Encrypting your files...")
-ransom_amount = "500 USD"
-payment_method = "bitcoin"
-print("Send", ransom_amount, "to our", payment_method, "wallet to decrypt your data.")
-# WARNING: This is not real malware. Educational demo only.`;
-    const blob=new Blob([malData],{type:'text/plain'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ransomware_sample.py';a.click();
-  };
 })();
 </script>
+
 </body>
 </html>
