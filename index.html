@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Mini File Scanner</title>
+  <title>Ransomware File Scanner</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root{
+    :root {
       --bg1: #e6f0ff;
       --bg2: #f3e8ff;
       --glass: rgba(255,255,255,0.66);
@@ -17,413 +17,205 @@
       --red: #ef4444;
       --card-shadow: 0 10px 30px rgba(20,20,50,0.08);
       --radius: 14px;
-      --sm-radius: 10px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
+
+    *{box-sizing:border-box;}
+    body {
       margin:0;
-      min-height:100vh;
-      font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;
-      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
-      color:#0f172a;
+      font-family:"Poppins", sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      display:flex;justify-content:center;align-items:center;
+      padding:28px;min-height:100vh;
     }
 
-    /* Layout */
-    .container{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 420px;gap:22px;align-items:start}
-    @media (max-width:920px){ .container{grid-template-columns:1fr; padding-bottom:20px} }
+    .container {
+      width:100%;max-width:1100px;
+      display:grid;grid-template-columns:1fr 420px;
+      gap:22px;
+    }
+    @media (max-width:900px){.container{grid-template-columns:1fr;}}
 
-    /* Card */
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72));
+    .card {
+      background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.8));
       border-radius:var(--radius);
       padding:20px;
       box-shadow:var(--card-shadow);
-      backdrop-filter: blur(8px) saturate(120%);
-      border: 1px solid rgba(255,255,255,0.6);
+      backdrop-filter:blur(10px);
     }
 
-    header h1{margin:0;font-weight:600;font-size:20px}
-    header p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    h1 {margin:0;font-weight:600;font-size:22px;}
+    p {color:var(--muted);margin-top:4px;}
 
-    /* Upload area */
-    .uploader{
+    .uploader {
       margin-top:16px;
-      border-radius:12px;
-      padding:18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,255,0.92));
-      border:1px dashed rgba(16,24,40,0.06);
-      display:flex;
-      gap:14px;
-      align-items:center;
-      transition:transform .18s ease, box-shadow .18s ease;
-    }
-    .uploader.dragover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(16,24,40,0.06)}
-    .upload-left{flex:1;min-width:0}
-    .upload-left p{margin:0;font-weight:600}
-    .upload-left small{display:block;color:var(--muted);margin-top:6px}
-    .upload-actions{display:flex;gap:8px;align-items:center}
-    .btn{
-      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:600;cursor:pointer;
-      box-shadow: 0 6px 18px rgba(37,99,235,0.12);
-    }
-    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12);font-weight:600}
-    .btn:disabled{opacity:.6;cursor:default}
-
-    input[type="file"]{display:none}
-
-    /* Right side card (chart + results) */
-    .side{
+      border:2px dashed rgba(0,0,0,0.08);
       padding:20px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      align-items:stretch;
+      border-radius:12px;
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,0.8);
     }
-    .chart-card{display:flex;flex-direction:column;align-items:center;gap:8px}
-    .chart-wrap{width:220px;height:220px}
-    .status-badge{display:inline-block;padding:8px 12px;border-radius:999px;color:#fff;font-weight:700}
-    .status-safe{background:var(--green)}
-    .status-unsafe{background:var(--red)}
-    .status-unknown{background:#9ca3af}
-    .result-meta{width:100%}
-    .result-meta h3{margin:6px 0 4px 0;font-size:16px}
-    .result-meta pre{background:#fbfdff;padding:10px;border-radius:10px;border:1px solid rgba(16,24,40,0.03);overflow:auto;font-family:monospace;font-size:13px;color:#123}
+    .btn {
+      background:var(--accent);color:white;font-weight:600;
+      border:none;border-radius:8px;padding:10px 14px;cursor:pointer;
+    }
+    .btn.secondary {
+      background:transparent;color:var(--accent);border:1px solid var(--accent);
+    }
 
-    /* History area */
-    .history-list{margin-top:10px;display:flex;flex-direction:column;gap:8px}
-    .history-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg, #fff, #fbfdff);border:1px solid rgba(16,24,40,0.03)}
-    .history-item small{color:var(--muted)}
-    .history-controls{display:flex;gap:8px;align-items:center;margin-top:10px}
+    input[type=file]{display:none;}
+    .status-badge {
+      display:inline-block;padding:8px 12px;border-radius:999px;color:white;font-weight:700;
+    }
+    .status-safe{background:var(--green);}
+    .status-unsafe{background:var(--red);}
+    .status-unknown{background:#9ca3af;}
 
-    /* Footer small */
-    .note{margin-top:12px;color:var(--muted);font-size:13px}
+    .chart-wrap{width:220px;height:220px;margin:auto;}
 
-    /* Toast */
-    .toast-wrap{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:9999}
-    .toast{background:rgba(10,20,40,0.96);color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 8px 24px rgba(2,6,23,0.28);font-weight:600;font-size:14px;opacity:0;transform:translateY(8px);transition:all .28s cubic-bezier(.2,.9,.2,1)}
-    .toast.show{opacity:1;transform:translateY(0)}
-
-    /* small screens */
-    @media (max-width:560px){
-      .chart-wrap{width:160px;height:160px}
-      .container{gap:16px}
-      .uploader{flex-direction:column;align-items:flex-start}
-      .upload-actions{width:100%;justify-content:space-between}
+    .history-item {
+      background:white;border-radius:10px;padding:10px;
+      display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Left main card -->
     <div class="card">
-      <header>
-        <h1>Mini File Scanner</h1>
-        <p class="lead">Lightweight front-end demo using the EICAR test string to simulate antivirus detection. Drag & drop or click to upload a file.</p>
-      </header>
+      <h1>Ransomware File Scanner</h1>
+      <p>Upload any file to check for ransomware-like patterns. Works completely offline — no data leaves your device.</p>
 
-      <div id="dropZone" class="uploader" aria-label="File uploader drop zone">
-        <div class="upload-left">
-          <p id="dropText">Drop file here or click <span style="font-weight:700">Browse</span></p>
-          <small>Best for plain text files (.txt, .py, .js). PDFs may work if they contain the EICAR text.</small>
+      <div id="dropZone" class="uploader">
+        <div>
+          <p><strong>Drop file here</strong> or click Browse</p>
+          <small style="color:var(--muted);">Supports .txt, .py, .js, and other text files.</small>
         </div>
-
-        <div class="upload-actions">
-          <label class="btn" for="fileInput" id="browseBtn">Browse</label>
+        <div>
+          <label class="btn" for="fileInput">Browse</label>
           <button class="btn secondary" id="btnScan">Scan</button>
+          <input id="fileInput" type="file" />
         </div>
-
-        <input id="fileInput" type="file" aria-label="Select file for scanning" />
       </div>
 
-      <div class="note">Tip: Use the <strong>Download EICAR</strong> button (right) to create a harmless "malicious" test file that will be detected. This demo does not upload files anywhere — scanning is done locally in your browser.</div>
-
-      <div style="margin-top:18px; display:flex; gap:10px; align-items:center;">
-        <button class="btn secondary" id="downloadEicar">Download EICAR</button>
+      <div style="margin-top:16px;">
         <button class="btn secondary" id="downloadSafe">Download Safe File</button>
-        <div style="flex:1"></div>
-        <button class="btn secondary" id="clearHistoryBtn">Clear History</button>
+        <button class="btn secondary" id="downloadMal">Download Ransomware Sample</button>
       </div>
 
-      <!-- history -->
-      <div style="margin-top:18px">
-        <h3 style="margin:0 0 8px 0;font-size:16px">Scan History</h3>
-        <div id="history" class="history-list" aria-live="polite"></div>
-      </div>
+      <h3 style="margin-top:20px;">Scan History</h3>
+      <div id="history" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
-    <!-- Right side: chart + result -->
-    <div class="card side">
-      <div class="chart-card">
-        <div class="chart-wrap">
-          <canvas id="chartCanvas" width="220" height="220" aria-label="Scan result chart"></canvas>
-        </div>
-        <div id="statusWrap" style="display:flex;gap:12px;align-items:center;">
-          <div id="statusBadge" class="status-badge status-unknown">UNKNOWN</div>
-          <div style="font-size:13px;color:var(--muted)" id="fileNameDisplay">No file scanned</div>
-        </div>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="chartCanvas" width="220" height="220"></canvas></div>
+      <div style="text-align:center;margin-top:10px;">
+        <div id="statusBadge" class="status-badge status-unknown">UNKNOWN</div>
+        <p id="fileNameDisplay">No file scanned</p>
       </div>
-
-      <div class="result-meta">
+      <div>
         <h3>Scan Details</h3>
-        <div id="detectedInfo" style="margin-bottom:8px;color:var(--muted)">No result yet. Upload a file to scan.</div>
-        <pre id="rawPreview" aria-live="polite" style="min-height:72px">—</pre>
+        <div id="detectedInfo" style="font-size:14px;color:var(--muted)">No results yet.</div>
+        <pre id="rawPreview" style="background:#f9fafb;border-radius:8px;padding:10px;min-height:100px;overflow:auto;font-size:12px;"></pre>
       </div>
     </div>
   </div>
 
-  <!-- Toast area -->
-  <div class="toast-wrap" id="toastWrap" aria-hidden="true"></div>
-
 <script>
 (() => {
-  // Exact EICAR string — double-escaped backslash in JS string literal
-  const EICAR = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+  const ransomKeywords = ["encrypt","decrypt","ransom","bitcoin","wallet","payment","key","locker","restore","decryptor"];
+  const ransomAmountPattern = /\b(\$?\d+\s?(usd|bitcoin|btc)?)\b/i;
 
-
-  // Elements
-  const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
-  const browseBtn = document.getElementById('browseBtn');
   const btnScan = document.getElementById('btnScan');
   const statusBadge = document.getElementById('statusBadge');
   const fileNameDisplay = document.getElementById('fileNameDisplay');
   const detectedInfo = document.getElementById('detectedInfo');
   const rawPreview = document.getElementById('rawPreview');
   const historyEl = document.getElementById('history');
-  const downloadEicar = document.getElementById('downloadEicar');
   const downloadSafe = document.getElementById('downloadSafe');
-  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-  const toastWrap = document.getElementById('toastWrap');
+  const downloadMal = document.getElementById('downloadMal');
   let currentFile = null;
 
-  // Chart setup
   const ctx = document.getElementById('chartCanvas').getContext('2d');
   const chart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Safe','Unsafe'],
-      datasets: [{
-        data: [1,0],
-        backgroundColor: ['#16a34a','#ef4444'],
-        hoverOffset: 6
-      }]
-    },
-    options: {
-      responsive: false,
-      cutout: '68%',
-      animation: { animateRotate: true, duration: 700 },
-      plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}}}
-    }
+    type:'doughnut',
+    data:{labels:['Safe','Ransomware'],datasets:[{data:[1,0],backgroundColor:['#16a34a','#ef4444']}]},
+    options:{cutout:'70%',plugins:{legend:{position:'bottom'}}}
   });
 
-  // Utility: show toast
-  function showToast(text, duration=2500) {
-    const t = document.createElement('div');
-    t.className = 'toast';
-    t.textContent = text;
-    toastWrap.appendChild(t);
-    // show
-    setTimeout(()=> t.classList.add('show'), 10);
-    // hide
-    setTimeout(()=> {
-      t.classList.remove('show');
-      setTimeout(()=> t.remove(), 300);
-    }, duration);
-  }
-
-  // Drag & drop handlers
-  ;['dragenter','dragover'].forEach(ev => {
-    dropZone.addEventListener(ev, (e) => {
-      e.preventDefault(); e.stopPropagation();
-      dropZone.classList.add('dragover');
-    });
-  });
-  ;['dragleave','drop'].forEach(ev => {
-    dropZone.addEventListener(ev, (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (ev === 'drop') {
-        const files = e.dataTransfer.files;
-        if (files && files[0]) handleFileSelected(files[0]);
-      }
-      dropZone.classList.remove('dragover');
-    });
+  fileInput.addEventListener('change', e=>{
+    currentFile = e.target.files[0];
+    if(currentFile) fileNameDisplay.textContent = currentFile.name;
   });
 
-  // File input change
-  fileInput.addEventListener('change', (e) => {
-    const f = e.target.files[0];
-    if (f) handleFileSelected(f);
+  btnScan.addEventListener('click', ()=>{
+    if(!currentFile){alert('Please select a file first!');return;}
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const text = e.target.result.toLowerCase();
+      const matches = ransomKeywords.filter(k=>text.includes(k));
+      const amount = text.match(ransomAmountPattern);
+      const isRansom = matches.length>2 || amount;
+      updateUI(isRansom,matches,amount,text);
+      saveHistory({name:currentFile.name,unsafe:isRansom,time:new Date().toLocaleString()});
+    };
+    reader.readAsText(currentFile);
   });
 
-  // clickable "Browse" label triggers fileInput (it's linked via for attribute)
-  // scan button
-  btnScan.addEventListener('click', () => {
-    if (!currentFile) { showToast('Please choose a file first', 1800); return; }
-    performScan(currentFile);
-  });
-
-  // Handle selected file
-  function handleFileSelected(file) {
-    currentFile = file;
-    fileNameDisplay.textContent = file.name;
-    rawPreview.textContent = 'Ready to scan — click Scan';
-    statusBadge.className = 'status-badge status-unknown';
-    statusBadge.textContent = 'READY';
-    showToast('File selected: ' + file.name, 1200);
-  }
-
-  // Read as text, fallback to arraybuffer decode
-  function readFileAsTextFallback(file) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result || '';
-        // if found, return
-        if (text.includes(EICAR)) return resolve({ found:true, raw:text });
-        // otherwise decode bytes
-        const r2 = new FileReader();
-        r2.onload = (ev) => {
-          try {
-            const arr = new Uint8Array(ev.target.result);
-            const decoded = new TextDecoder('utf-8', { fatal: false }).decode(arr);
-            if (decoded.includes(EICAR)) return resolve({ found:true, raw:decoded });
-            return resolve({ found:false, raw: decoded.slice(0,2000) });
-          } catch (err) {
-            return resolve({ found:false, raw:'' });
-          }
-        };
-        r2.readAsArrayBuffer(file);
-      };
-      reader.onerror = () => resolve({ found:false, raw:'' });
-      reader.readAsText(file);
-    });
-  }
-
-  // Perform scan
-  async function performScan(file) {
-    btnScan.disabled = true;
-    btnScan.textContent = 'Scanning...';
-    try {
-      const { found, raw } = await readFileAsTextFallback(file);
-      const safe = !found;
-      updateResultUI(file.name, safe, raw || '');
-      pushHistory({ filename: file.name, safe: safe, when: new Date().toLocaleString(), type: file.type });
-      showToast('Scan complete: ' + (safe? 'SAFE' : 'UNSAFE'), 1600);
-    } catch (err) {
-      console.error(err);
-      showToast('Scan failed');
-      updateResultUI(file.name, null, '');
-    } finally {
-      btnScan.disabled = false;
-      btnScan.textContent = 'Scan';
-    }
-  }
-
-  // Update UI result and chart
-  function updateResultUI(filename, safe, rawSnippet) {
-    fileNameDisplay.textContent = filename || ' — ';
-    if (safe === true) {
+  function updateUI(isRansom,words,amount,text){
+    if(isRansom){
+      statusBadge.className = 'status-badge status-unsafe';
+      statusBadge.textContent = 'RANSOMWARE';
+      detectedInfo.innerHTML = `<strong>Detected keywords:</strong> ${words.join(', ')}<br>${amount?`<strong>Demand:</strong> ${amount[0]}`:''}`;
+      chart.data.datasets[0].data=[0,1];
+    } else {
       statusBadge.className = 'status-badge status-safe';
       statusBadge.textContent = 'SAFE';
-      detectedInfo.innerHTML = '<strong>Detected:</strong> None';
-      chart.data.datasets[0].data = [1,0];
-    } else if (safe === false) {
-      statusBadge.className = 'status-badge status-unsafe';
-      statusBadge.textContent = 'UNSAFE';
-      detectedInfo.innerHTML = '<strong>Detected:</strong> EICAR-Test-Signature';
-      chart.data.datasets[0].data = [0,1];
-    } else {
-      statusBadge.className = 'status-badge status-unknown';
-      statusBadge.textContent = 'UNKNOWN';
-      detectedInfo.innerHTML = 'No reliable result';
-      chart.data.datasets[0].data = [0,0];
+      detectedInfo.textContent = 'No ransomware patterns detected.';
+      chart.data.datasets[0].data=[1,0];
     }
-    rawPreview.textContent = rawSnippet ? rawSnippet.slice(0,500) : '—';
+    rawPreview.textContent = text.slice(0,400);
     chart.update();
   }
 
-  // History: localStorage
-  function pushHistory(entry) {
-    const cur = JSON.parse(localStorage.getItem('miniScannerHistory') || '[]');
-    cur.unshift(entry);
-    if (cur.length > 50) cur.pop();
-    localStorage.setItem('miniScannerHistory', JSON.stringify(cur));
+  function saveHistory(entry){
+    const hist = JSON.parse(localStorage.getItem('ransomHistory')||'[]');
+    hist.unshift(entry); if(hist.length>20) hist.pop();
+    localStorage.setItem('ransomHistory',JSON.stringify(hist));
     renderHistory();
   }
-  function renderHistory() {
-    const cur = JSON.parse(localStorage.getItem('miniScannerHistory') || '[]');
-    historyEl.innerHTML = '';
-    if (cur.length === 0) {
-      const p = document.createElement('div');
-      p.style.color = 'var(--muted)';
-      p.style.padding = '6px 0';
-      p.textContent = 'No scans yet. Your history is stored locally in this browser.';
-      historyEl.appendChild(p);
-      return;
-    }
-    cur.forEach(it => {
-      const item = document.createElement('div');
-      item.className = 'history-item';
-      item.innerHTML = `<div>
-          <div style="font-weight:600">${escapeHtml(it.filename)}</div>
-          <small>${escapeHtml(it.when)}</small>
-        </div>
-        <div style="text-align:right">
-          <div style="font-weight:700;color:${it.safe? 'var(--green)':'var(--red)'}">${it.safe? 'SAFE':'UNSAFE'}</div>
-          <small style="color:var(--muted)">${it.type || '—'}</small>
-        </div>`;
-      historyEl.appendChild(item);
+
+  function renderHistory(){
+    const hist = JSON.parse(localStorage.getItem('ransomHistory')||'[]');
+    historyEl.innerHTML='';
+    if(hist.length===0){historyEl.innerHTML='<p style="color:gray;">No scans yet.</p>';return;}
+    hist.forEach(h=>{
+      const el=document.createElement('div');
+      el.className='history-item';
+      el.innerHTML=`<div><strong>${h.name}</strong><br><small>${h.time}</small></div>
+                    <div style="color:${h.unsafe?'#ef4444':'#16a34a'};font-weight:700;">${h.unsafe?'Ransomware':'Safe'}</div>`;
+      historyEl.appendChild(el);
     });
   }
 
-  // Clear history
-  clearHistoryBtn.addEventListener('click', () => {
-    if (!confirm('Clear local scan history?')) return;
-    localStorage.removeItem('miniScannerHistory');
-    renderHistory();
-    showToast('History cleared', 1200);
-  });
-
-  // Download EICAR / safe files
-  downloadEicar.addEventListener('click', () => {
-    const blob = new Blob([EICAR], { type:'text/plain' });
-    triggerDownload(blob, 'malicious_test.txt');
-  });
-  downloadSafe.addEventListener('click', () => {
-    const safe = 'This is a harmless test file for scanner demo. Created: ' + new Date().toLocaleDateString();
-    const blob = new Blob([safe], { type:'text/plain' });
-    triggerDownload(blob, 'safe_test.txt');
-  });
-  function triggerDownload(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  // helper: escapeHtml
-  function escapeHtml(s) {
-    return (s || '').toString().replace(/[&<>"']/g, ch => {
-      const map = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' };
-      return map[ch] || ch;
-    });
-  }
-
-  // Initialize
   renderHistory();
-  updateResultUI('', null, '');
 
-  // Optional: auto-select file when user clicks "Browse" label (it already triggers fileInput)
-  // Accessibility: allow pressing Enter on dropZone to trigger file dialog
-  dropZone.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') fileInput.click();
-  });
+  downloadSafe.onclick=()=>{
+    const safeData="print('Hello! This is a harmless Python file.')\n# Safe file example";
+    const blob=new Blob([safeData],{type:'text/plain'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='safe_file.py';a.click();
+  };
 
+  downloadMal.onclick=()=>{
+    const malData=`# Simulated ransomware script (for demo)
+print("Encrypting your files...")
+ransom_amount = "500 USD"
+payment_method = "bitcoin"
+print("Send", ransom_amount, "to our", payment_method, "wallet to decrypt your data.")
+# WARNING: This is not real malware. Educational demo only.`;
+    const blob=new Blob([malData],{type:'text/plain'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ransomware_sample.py';a.click();
+  };
 })();
 </script>
 </body>
